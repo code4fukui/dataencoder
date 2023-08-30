@@ -1,0 +1,81 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:">
+<title>dataencoder</title>
+</head><body>
+<h1>dataencoder</h1>
+<div id=div_encs></div>
+<textarea id=ta></textarea>
+
+<script type="module">
+import { setDropFilesListener } from "https://js.sabae.cc/setDropFilesListener.js";
+import { encodeTag } from "./encodeTag.js";
+import { waitFileRead } from "https://js.sabae.cc/waitFileRead.js";
+import { Base64 } from "https://code4fukui.github.io/Base64/Base64.js";
+import { Base64URL } from "https://code4fukui.github.io/Base64URL/Base64URL.js";
+import { Base1024Y } from "https://code4fukui.github.io/Base1024Y/Base1024Y.js";
+import { Base256B } from "https://code4fukui.github.io/Base256B/Base256B.js";
+import { Base16384 } from "https://code4fukui.github.io/Base16384/Base16384.js";
+import { Base16 } from "https://code4fukui.github.io/Base16/Base16.js";
+
+const encs = {
+  "tag": encodeTag,
+  "data": async (f) => encodeTag(f, false),
+  "Base64": async (f) => Base64.encode(await waitFileRead(f.file)),
+  "Base64URL": async (f) => Base64URL.encode(await waitFileRead(f.file)),
+  "Base1024Y": async (f) => Base1024Y.encode(await waitFileRead(f.file)),
+  "Base256B": async (f) => Base256B.encode(await waitFileRead(f.file)),
+  "Base16384": async (f) => Base16384.encode(await waitFileRead(f.file)),
+  "Base16": async (f) => Base16.encode(await waitFileRead(f.file)),
+};
+
+const cr = (tag, p) => {
+  const c = document.createElement(tag);
+  p.appendChild(c);
+  return c;
+};
+const inps = {};
+let first = true;
+for (const name in encs) {
+  const l = cr("label", div_encs);
+  const inp = cr("input", l);
+  inp.type = "radio";
+  inp.name = "group_encs";
+  cr("span", l).textContent = name;
+  inps[name] = { inp, encode: encs[name] };
+  if (first) {
+    inp.checked = true;
+    first = false;
+  }
+}
+
+setDropFilesListener(document.body, async (files) => {
+  const file = files[0];
+  //ta.value = await encodeTag(file);
+  
+  const enc = async () => {
+    for (const name in inps) {
+      if (!inps[name].inp.checked) continue;
+      ta.value = await inps[name].encode(file);
+    }
+  };
+  await enc();
+  for (const name in inps) {
+    inps[name].inp.onchange = enc;
+  }
+});
+</script>
+
+<a href=https://github.com/code4fukui/dataencoder/>src on GitHub</a>
+
+<style>
+body {
+  height: 100vh;
+  box-sizing: border-box;
+}
+textarea {
+  display: block;
+  width: calc(100% - 2em);
+  margin: 1em;
+  resize: none;
+  height: calc(100% - 14em);
+}
+</style>
