@@ -1,5 +1,5 @@
 import { waitFileRead } from "https://js.sabae.cc/waitFileRead.js";
-import { Base64 } from "https://code4fukui.github.io/Base64/Base64.js";
+import { encodeData } from "./encodeData.js";
 
 export const encodeTag = async (file, addtag = true) => {
   const tagmap = {
@@ -8,7 +8,7 @@ export const encodeTag = async (file, addtag = true) => {
   };
   const tagname = tagmap[file.type.substring(0, file.type.indexOf("/"))];
   const bin = await waitFileRead(file.file);
-  const txt = `data:${file.type};base64,${Base64.encode(bin)}`;
+  const txt = encodeData(file.type, bin);
   if (tagname && addtag) {
     return `<${tagname} src="${txt}">`;
   }
