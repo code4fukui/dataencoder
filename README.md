@@ -16,3 +16,9 @@ setDropFilesListener(document.body, async (files) => {
 </script>
 ```
 - [run on ss.sabae.cc](https://ss.sabae.cc/#885)
+
+```js
+import { encodeData } from "https://code4fukui.github.io//dataencoder/encodeData.js";
+
+console.log(encodeData("audio/mp3", mp3bin);
+```
